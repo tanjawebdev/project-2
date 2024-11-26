@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public float speed = 1.0f;
 
     public AudioClip collectSound;
+    public AudioClip deathSound;
+
+    public AudioSource backgroundMusic;
 
     private Rigidbody rb;
 
@@ -41,10 +44,19 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-//        Debug.Log("Diamond collected");
+        if (other.gameObject.CompareTag("Diamond"))
+        {
+            other.gameObject.SetActive(false);
+            audioSource.PlayOneShot(collectSound);
+            Debug.Log("Hit a Diamand");
+        }
 
-        other.gameObject.SetActive(false);
-
-        audioSource.PlayOneShot(collectSound);
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("We have been caught!");
+            audioSource.PlayOneShot(deathSound);
+            backgroundMusic.Stop();
+            rb.isKinematic = true;
+        }
     }
 }
