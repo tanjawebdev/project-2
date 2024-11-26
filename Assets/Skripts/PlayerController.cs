@@ -7,7 +7,11 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 1.0f;
 
+    public AudioClip collectSound;
+
     private Rigidbody rb;
+
+    private AudioSource audioSource;
 
     private float movementX;
     private float movementY;
@@ -16,6 +20,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnMove(InputValue movementValue)
@@ -32,5 +37,14 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = new Vector3(movementX, 0, movementY);
 
         rb.AddForce(direction * speed);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+//        Debug.Log("Diamond collected");
+
+        other.gameObject.SetActive(false);
+
+        audioSource.PlayOneShot(collectSound);
     }
 }
