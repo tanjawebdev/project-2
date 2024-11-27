@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,19 +14,26 @@ public class PlayerController : MonoBehaviour
     public AudioClip deathSound;
 
     public AudioSource backgroundMusic;
+    public TextMeshProUGUI countText;
+    public TextMeshProUGUI winLooseText;
 
     private Rigidbody rb;
-
     private AudioSource audioSource;
 
     private float movementX;
     private float movementY;
+
+    private int count = 0;
+    private int maxCount = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+
+        maxCount = GameObject.FindGameObjectsWithTag("Diamond").Length;
+        SetCountText();
     }
 
     private void OnMove(InputValue movementValue)
@@ -48,15 +58,37 @@ public class PlayerController : MonoBehaviour
         {
             other.gameObject.SetActive(false);
             audioSource.PlayOneShot(collectSound);
-            Debug.Log("Hit a Diamand");
+            count++;
+            SetCountText();
+
+            if (count >= maxCount)
+            {
+                winLooseText.text = "I won!";
+                winLooseText.color = Color.green;
+                Invoke(nameof(BackToMenu), 5f);
+            }
         }
 
         if (other.gameObject.CompareTag("Enemy"))
         {
-            Debug.Log("We have been caught!");
             audioSource.PlayOneShot(deathSound);
             backgroundMusic.Stop();
             rb.isKinematic = true;
+
+            winLooseText.text = "I have been caught!!";
+            winLooseText.color = Color.red;
+
+            Invoke(nameof(BackToMenu), 5f);
         }
+    }
+
+    private void SetCountText()
+    {
+        countText.text = "Count: " + count + " | " + maxCount;
+    }
+
+    private void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
